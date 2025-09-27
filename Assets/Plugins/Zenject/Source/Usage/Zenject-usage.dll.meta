@@ -1,0 +1,43 @@
+fileFormatVersion: 2
+guid: 700aed094b237904eb96e963264dd6ff
+<<<<<<< HEAD
+=======
+timeCreated: 1527419737
+licenseType: Store
+>>>>>>> 87b29e02c6e6097127fb218ef4a2d2a6dbd00a4c
+PluginImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  iconMap: {}
+  executionOrder: {}
+<<<<<<< HEAD
+  defineConstraints: []
+  isPreloaded: 0
+  isOverridable: 0
+  isExplicitlyReferenced: 0
+  validateReferences: 1
+=======
+  isPreloaded: 0
+  isOverridable: 0
+>>>>>>> 87b29e02c6e6097127fb218ef4a2d2a6dbd00a4c
+  platformData:
+  - first:
+      Any: 
+    second:
+      enabled: 1
+      settings: {}
+  - first:
+      Editor: Editor
+    second:
+      enabled: 0
+      settings:
+        DefaultValueInitialized: true
+  - first:
+      Windows Store Apps: WindowsStoreApps
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
