@@ -1,34 +1,69 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class Mover : MonoBehaviour
 {
-	[SerializeField]
-	private float _moveTime = 1f;
-	[SerializeField]
-	private float _delayTime = 2f;
-	[SerializeField]
-	private Vector3[] _positions;
+    [SerializeField] private Vector3 _start; // Начальная точка
+    [SerializeField] private Vector3 _end;   // Конечная точка
+    [SerializeField] private float _speed;   // Скорость движения
+    [SerializeField] private float _delay;   // Задержка в конечных точках
 
-	private IEnumerator Start()
+    // Итерационный метод Start
+    public IEnumerator Start()
     {
-		if(_positions.Length < 2) yield break;
-		int prev = 0, curr = 1;
-		var time = 0f;
-		var transform = this.transform;
-		while(true)
-		{
-			transform.position = Vector3.Lerp(_positions[prev], _positions[curr], time / _moveTime);
-			time += Time.deltaTime;
-			if(time >= _moveTime)
-			{
-				time = 0f;
-				prev = curr;
-				curr = (curr + 1) % _positions.Length;
-				yield return new WaitForSeconds(_delayTime);
-			}
+        // Получаем физическое тело объекта
+        Rigidbody rb = GetComponent<Rigidbody>();
 
-			yield return null;
-		}
-	}
+        // Проверяем, есть ли компонент Rigidbody
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody component is missing!");
+            yield break;
+        }
+
+        // Настраиваем физическое тело как кинематическое
+        rb.isKinematic = true;
+
+        // Бесконечный цикл движения
+        while (true)
+        {
+            // Движение от _start к _end
+            yield return StartCoroutine(MoveToPosition(rb, _start, _end));
+
+            // Пауза в конечной точке
+            yield return new WaitForSeconds(_delay);
+
+            // Движение от _end к _start
+            yield return StartCoroutine(MoveToPosition(rb, _end, _start));
+
+            // Пауза в начальной точке
+            yield return new WaitForSeconds(_delay);
+        }
+    }
+
+    // Вспомогательная корутина для движения к позиции
+    private IEnumerator MoveToPosition(Rigidbody rb, Vector3 from, Vector3 to)
+    {
+        float distance = Vector3.Distance(from, to);
+        float duration = distance / _speed;
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.fixedDeltaTime;
+            float t = elapsedTime / duration;
+
+            // Плавное движение с использованием Lerp
+            Vector3 newPosition = Vector3.Lerp(from, to, t);
+
+            // Перемещаем кинематическое физическое тело
+            rb.MovePosition(newPosition);
+
+            // Ждем следующий физический кадр
+            yield return new WaitForFixedUpdate();
+        }
+
+        // Гарантируем точное позиционирование в конечной точке
+        rb.MovePosition(to);
+    }
 }
