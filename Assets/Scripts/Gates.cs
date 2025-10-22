@@ -8,15 +8,15 @@ public class Gates : MonoBehaviour
     private int _score = 0;
 
 
-    void OnTriggerEnter(Collider other)
+    void OnTriggerStay(Collider other)
     {
-        // Проверяем материал через тег или слой
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         if (other.CompareTag(_tag))
         {
             Destroy(other.gameObject);
             _score++;
-            //в консоль выводится текущий игровой счет -->
-            Debug.Log($"Голов - {_score}");
+            //пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ -->
+            Debug.Log($"пїЅпїЅпїЅпїЅпїЅ - {_score}");
         }
     }
 }
