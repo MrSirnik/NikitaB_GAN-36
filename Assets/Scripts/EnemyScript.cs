@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
-public class EnemyScript : MonoBehaviour
+[CustomEditor(typeof(FildOfView))]
+public class EnemyScript : Editor
 {
     [Tooltip("ќтслеживание позиции и ориентации противника")]
     [SerializeField]
@@ -18,14 +20,8 @@ public class EnemyScript : MonoBehaviour
     [SerializeField]
     private float _rangeVisibility = 10f;
 
-
-    void Start()
-    {
-
-    }
-
     void Update()
     {
-
+        //Handles.Circle.Draw
     }
 }
