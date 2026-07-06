@@ -6,6 +6,16 @@ namespace FPS
 {
     public class WeaponController : MonoBehaviour
     {
+        // Жёсткий потолок скорострельности для всех оружий, не зависит от WeaponData.fireCooldown -
+        // ни одно оружие (текущее или будущее) не выстрелит чаще ~12.5 раз в секунду.
+        private const float MinFireInterval = 0.08f;
+
+        // Вспышка выстрела должна исчезать намного быстрее интервала между выстрелами,
+        // иначе при длинной очереди эффекты накапливаются в кучу.
+        private const float MuzzleFlashLifetime = 0.25f;
+        private const float ExplosionEffectLifetime = 1.2f;
+        private const float SmokeEffectLifetime = 2f;
+
         [SerializeField] private WeaponData _data;
         [SerializeField] private Transform _muzzle;
         [SerializeField] private Camera _aimCamera;
@@ -41,14 +51,14 @@ namespace FPS
         {
             if (_data == null || _cooldownTimer > 0f) return false;
 
-            _cooldownTimer = _data.fireCooldown;
+            _cooldownTimer = Mathf.Max(_data.fireCooldown, MinFireInterval);
             Fire();
             return true;
         }
 
         private void Fire()
         {
-            EffectSpawner.Spawn(FpsAssetPaths.MuzzleFlash, _muzzle.position, _muzzle.rotation);
+            EffectSpawner.Spawn(FpsAssetPaths.MuzzleFlash, _muzzle.position, _muzzle.rotation, MuzzleFlashLifetime);
             FpsAudio.PlayAt(_data.fireSoundPath, _muzzle.position);
             PlayRecoil();
 
@@ -85,7 +95,7 @@ namespace FPS
             }
 
             SurfaceType surface = hitsValidTarget ? SurfaceType.Flesh : ResolveSurface(hitCollider);
-            EffectSpawner.Spawn(EffectSpawner.ImpactEffectFor(surface), point, Quaternion.LookRotation(normal));
+            ImpactDecal.Spawn(surface, point, normal);
         }
 
         private static SurfaceType ResolveSurface(Collider hitCollider)
@@ -140,8 +150,8 @@ namespace FPS
 
         private void HandleExplosion(Vector3 point, int _)
         {
-            EffectSpawner.Spawn(FpsAssetPaths.SmallExplosion, point, Quaternion.identity);
-            EffectSpawner.Spawn(FpsAssetPaths.Smoke, point, Quaternion.identity);
+            EffectSpawner.Spawn(FpsAssetPaths.SmallExplosion, point, Quaternion.identity, ExplosionEffectLifetime);
+            EffectSpawner.Spawn(FpsAssetPaths.Smoke, point, Quaternion.identity, SmokeEffectLifetime);
             FpsAudio.PlayAt(FpsAssetPaths.ExplosionClip, point);
 
             var damagedAlready = new HashSet<IDamageable>();

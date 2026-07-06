@@ -27,7 +27,11 @@ namespace FPS
 
         private static Material ConvertToBuiltin(Material source, bool isParticle)
         {
-            Shader shader = isParticle ? Shader.Find("Particles/Standard Unlit") : Shader.Find("Standard");
+            // "Particles/Standard Unlit" по умолчанию непрозрачный, поэтому чёрный фон
+            // текстуры искры/вспышки рисовался сплошной чёрной карточкой вместо того, чтобы исчезать.
+            // "Particles/Additive" всегда аддитивный (без настройки _Mode) - чёрный = невидимый,
+            // а именно так и нарисованы все текстуры попаданий/вспышек в проекте.
+            Shader shader = isParticle ? Shader.Find("Particles/Additive") : Shader.Find("Standard");
             if (shader == null) shader = Shader.Find("Sprites/Default");
 
             var converted = new Material(shader) { name = source.name + "_Builtin" };

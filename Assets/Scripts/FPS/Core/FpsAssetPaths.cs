@@ -5,11 +5,6 @@ namespace FPS
         private const string ParticlePack = "Assets/UnityTechnologies/ParticlePack/EffectExamples";
 
         public const string MuzzleFlash = ParticlePack + "/Weapon Effects/Prefabs/MuzzleFlash01.prefab";
-        public const string FleshImpact = ParticlePack + "/Weapon Effects/Prefabs/FleshImpacts.prefab";
-        public const string MetalImpact = ParticlePack + "/Weapon Effects/Prefabs/MetalImpacts.prefab";
-        public const string WoodImpact = ParticlePack + "/Weapon Effects/Prefabs/WoodImpacts.prefab";
-        public const string StoneImpact = ParticlePack + "/Weapon Effects/Prefabs/StoneImpacts.prefab";
-        public const string SandImpact = ParticlePack + "/Weapon Effects/Prefabs/SandImpacts.prefab";
         public const string Sparks = ParticlePack + "/Misc Effects/Prefabs/SparksEffect.prefab";
 
         public const string SmallExplosion = "Assets/Effects/Explosion/SmallExplosion.prefab";
