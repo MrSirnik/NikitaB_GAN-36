@@ -322,13 +322,13 @@ namespace FPS
 
         private static void BuildEnemies(LevelTheme theme, Transform player)
         {
-            Vector3[] rangedSpots = { new(8f, 0f, 6f), new(-8f, 0f, 10f), new(10f, 0f, -6f) };
+            Vector3[] rangedSpots = { new(8f, 0f, 6f), new(-8f, 0f, 9f), new(6f, 0f, -6f) };
             foreach (Vector3 spot in rangedSpots)
             {
                 BuildRangedEnemy(spot);
             }
 
-            BuildMeleeEnemy(new Vector3(-10f, 0f, -8f));
+            BuildMeleeEnemy(new Vector3(-6f, 0f, -8f));
         }
 
         private static GameObject CreateEnemyRoot(string name, Vector3 position)
