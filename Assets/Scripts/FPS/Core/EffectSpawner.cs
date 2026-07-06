@@ -14,6 +14,7 @@ namespace FPS
             if (prefab == null) return;
 
             GameObject instance = Object.Instantiate(prefab, position, rotation);
+            MaterialCompat.FixForBuiltinPipeline(instance);
             Object.Destroy(instance, lifetime);
         }
 

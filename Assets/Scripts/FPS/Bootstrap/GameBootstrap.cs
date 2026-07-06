@@ -23,6 +23,7 @@ namespace FPS
 
         private static void BuildLevel(LevelTheme theme)
         {
+            RemoveStaticSceneCamera();
             BuildGround(theme);
             BuildDressing(theme);
             BuildCoverZone();
@@ -32,12 +33,20 @@ namespace FPS
             ConfigureSun(theme);
             BakeNavMesh();
 
-            GameObject player = BuildPlayer(new Vector3(0f, 1f, -14f));
+            GameObject player = BuildPlayer(new Vector3(0f, 1f, -6f));
             BuildEnemies(theme, player.transform);
             BuildTurret(new Vector3(7f, 1f, -7f));
 
             var minimap = new GameObject("MinimapSetup").AddComponent<MinimapSetup>();
             minimap.SetFollowTarget(player.transform);
+        }
+
+        private static void RemoveStaticSceneCamera()
+        {
+            foreach (Camera camera in Object.FindObjectsByType<Camera>(FindObjectsSortMode.None))
+            {
+                Object.Destroy(camera.gameObject);
+            }
         }
 
         private static void BuildGround(LevelTheme theme)
@@ -145,6 +154,7 @@ namespace FPS
             if (prefab == null) return;
 
             GameObject instance = Object.Instantiate(prefab, position, Quaternion.identity);
+            MaterialCompat.FixForBuiltinPipeline(instance);
             if (instance.GetComponentInChildren<SurfaceMarker>() == null)
             {
                 instance.AddComponent<SurfaceMarker>().SetSurface(surface);
@@ -366,6 +376,7 @@ namespace FPS
             {
                 GameObject visual = Object.Instantiate(heroPrefab, root.transform, false);
                 visual.transform.localPosition = Vector3.zero;
+                MaterialCompat.FixForBuiltinPipeline(visual);
             }
 
             var collider = root.AddComponent<CapsuleCollider>();
