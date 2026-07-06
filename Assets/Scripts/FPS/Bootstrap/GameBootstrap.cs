@@ -12,6 +12,14 @@ namespace FPS
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Run()
         {
+            // Если уровень уже собран заранее (см. LevelBaker), объекты уже лежат в сцене -
+            // достаточно только пересчитать NavMesh: он не сохраняется в сцену и нужен каждый запуск.
+            if (Object.FindFirstObjectByType<BakedLevelMarker>() != null)
+            {
+                BakeNavMesh();
+                return;
+            }
+
             string sceneName = SceneManager.GetActiveScene().name;
             switch (sceneName)
             {
@@ -19,6 +27,22 @@ namespace FPS
                 case "FPS_Forest": BuildLevel(LevelTheme.Forest); break;
                 case "FPS_Dungeon": BuildLevel(LevelTheme.Dungeon); break;
             }
+        }
+
+        // Точка входа для LevelBaker: собирает уровень в редакторе (вне Play Mode) и
+        // помечает сцену как готовую, чтобы Run() больше не пересобирал её с нуля.
+        public static void BakeLevelInEditor(string sceneName)
+        {
+            LevelTheme theme = sceneName switch
+            {
+                "FPS_Urban" => LevelTheme.Urban,
+                "FPS_Forest" => LevelTheme.Forest,
+                "FPS_Dungeon" => LevelTheme.Dungeon,
+                _ => throw new System.ArgumentException($"Неизвестная сцена FPS: {sceneName}"),
+            };
+
+            BuildLevel(theme);
+            new GameObject("BakedLevelMarker").AddComponent<BakedLevelMarker>();
         }
 
         private static void BuildLevel(LevelTheme theme)
@@ -39,6 +63,8 @@ namespace FPS
 
             var minimap = new GameObject("MinimapSetup").AddComponent<MinimapSetup>();
             minimap.SetFollowTarget(player.transform);
+
+            ControlsHud.Build();
         }
 
         private static void RemoveStaticSceneCamera()
@@ -120,6 +146,19 @@ namespace FPS
             canopy.transform.localScale = new Vector3(2.6f, 2.2f, 2.6f);
             canopy.GetComponent<Renderer>().material.color = new Color(0.16f, 0.4f, 0.18f);
             canopy.AddComponent<SurfaceMarker>().SetSurface(SurfaceType.Wood);
+
+            BuildCanopyLobe(position + new Vector3(0.9f, 3.3f, 0.4f), 1.6f, new Color(0.19f, 0.44f, 0.2f));
+            BuildCanopyLobe(position + new Vector3(-0.8f, 3.6f, -0.5f), 1.5f, new Color(0.14f, 0.36f, 0.16f));
+        }
+
+        private static void BuildCanopyLobe(Vector3 position, float scale, Color color)
+        {
+            var lobe = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            lobe.name = "TreeCanopyLobe";
+            lobe.transform.position = position;
+            lobe.transform.localScale = new Vector3(scale, scale * 0.85f, scale);
+            lobe.GetComponent<Renderer>().material.color = color;
+            lobe.AddComponent<SurfaceMarker>().SetSurface(SurfaceType.Wood);
         }
 
         private static void BuildDungeonDressing()
@@ -184,6 +223,22 @@ namespace FPS
             crate.GetComponent<Renderer>().material.color = new Color(0.5f, 0.35f, 0.15f);
             crate.AddComponent<SurfaceMarker>().SetSurface(SurfaceType.Wood);
             crate.AddComponent<Destructible>();
+
+            Color strapColor = new Color(0.3f, 0.2f, 0.08f);
+            AddDecoration(crate.transform, PrimitiveType.Cube, Vector3.zero, new Vector3(1.05f, 0.08f, 0.15f), strapColor);
+            AddDecoration(crate.transform, PrimitiveType.Cube, Vector3.zero, new Vector3(0.15f, 0.08f, 1.05f), strapColor);
+        }
+
+        private static void AddDecoration(Transform parent, PrimitiveType type, Vector3 localPos, Vector3 localScale, Color color, Quaternion? localRot = null)
+        {
+            GameObject decoration = GameObject.CreatePrimitive(type);
+            decoration.name = "Decoration";
+            decoration.transform.SetParent(parent, false);
+            decoration.transform.localPosition = localPos;
+            decoration.transform.localRotation = localRot ?? Quaternion.identity;
+            decoration.transform.localScale = localScale;
+            decoration.GetComponent<Renderer>().material.color = color;
+            Object.Destroy(decoration.GetComponent<Collider>());
         }
 
         private static void BuildDoor(Vector3 position)
@@ -203,6 +258,14 @@ namespace FPS
             trigger.transform.SetParent(door.transform, true);
 
             door.AddComponent<Door>();
+
+            var handle = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            handle.name = "DoorHandle";
+            handle.transform.position = position + new Vector3(1.2f, -0.3f, 0.15f);
+            handle.transform.localScale = Vector3.one * 0.15f;
+            handle.GetComponent<Renderer>().material.color = new Color(0.7f, 0.65f, 0.2f);
+            Object.Destroy(handle.GetComponent<Collider>());
+            handle.transform.SetParent(door.transform, true);
         }
 
         private static void BuildTrap(Vector3 position)
@@ -214,6 +277,18 @@ namespace FPS
             trap.GetComponent<Renderer>().material.color = Color.red;
             trap.GetComponent<Collider>().isTrigger = true;
             trap.AddComponent<Trap>();
+
+            Color spikeColor = new Color(0.25f, 0.25f, 0.27f);
+            Vector3[] spikeOffsets = { new(-0.5f, 0.12f, -0.5f), new(0.5f, 0.12f, -0.5f), new(-0.5f, 0.12f, 0.5f), new(0.5f, 0.12f, 0.5f), new(0f, 0.15f, 0f) };
+            foreach (Vector3 offset in spikeOffsets)
+            {
+                var spike = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                spike.name = "TrapSpike";
+                spike.transform.position = position + offset;
+                spike.transform.localScale = new Vector3(0.08f, 0.15f, 0.08f);
+                spike.GetComponent<Renderer>().material.color = spikeColor;
+                Object.Destroy(spike.GetComponent<Collider>());
+            }
         }
 
         private static void ConfigureSun(LevelTheme theme)
@@ -314,6 +389,7 @@ namespace FPS
 
                 WeaponController weapon = weaponObject.AddComponent<WeaponController>();
                 weapon.Configure(data, muzzle.transform, aimCamera, Faction.Player);
+                WeaponVisual.Build(weaponObject.transform, data);
                 result[i] = weapon;
             }
 
@@ -354,6 +430,13 @@ namespace FPS
             body.transform.SetParent(root.transform, false);
             body.transform.localPosition = new Vector3(0f, 0.9f, 0f);
             body.GetComponent<Renderer>().material.color = new Color(0.7f, 0.15f, 0.15f);
+
+            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            head.name = "Head";
+            head.transform.SetParent(root.transform, false);
+            head.transform.localPosition = new Vector3(0f, 1.65f, 0f);
+            head.transform.localScale = Vector3.one * 0.35f;
+            head.GetComponent<Renderer>().material.color = new Color(0.6f, 0.12f, 0.12f);
 
             var muzzle = new GameObject("Muzzle");
             muzzle.transform.SetParent(root.transform, false);
@@ -405,6 +488,14 @@ namespace FPS
             barrel.transform.localPosition = new Vector3(0f, 0.6f, 0.4f);
             barrel.transform.localScale = new Vector3(0.2f, 0.2f, 1f);
             barrel.GetComponent<Renderer>().material.color = Color.black;
+
+            var sensor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sensor.name = "TurretSensor";
+            sensor.transform.SetParent(turretObject.transform, false);
+            sensor.transform.localPosition = new Vector3(0f, 0.85f, 0.35f);
+            sensor.transform.localScale = Vector3.one * 0.15f;
+            sensor.GetComponent<Renderer>().material.color = new Color(0.8f, 0.1f, 0.1f);
+            Object.Destroy(sensor.GetComponent<Collider>());
 
             var muzzle = new GameObject("Muzzle");
             muzzle.transform.SetParent(turretObject.transform, false);

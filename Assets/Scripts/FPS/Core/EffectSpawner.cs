@@ -33,14 +33,5 @@ namespace FPS
 
             return prefab;
         }
-
-        public static string ImpactEffectFor(SurfaceType surface) => surface switch
-        {
-            SurfaceType.Metal => FpsAssetPaths.MetalImpact,
-            SurfaceType.Wood => FpsAssetPaths.WoodImpact,
-            SurfaceType.Sand => FpsAssetPaths.SandImpact,
-            SurfaceType.Flesh => FpsAssetPaths.FleshImpact,
-            _ => FpsAssetPaths.StoneImpact,
-        };
     }
 }
