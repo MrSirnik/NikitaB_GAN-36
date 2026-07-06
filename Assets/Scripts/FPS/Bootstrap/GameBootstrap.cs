@@ -83,7 +83,7 @@ namespace FPS
             GameObject wallPrefab = ProjectAsset.Load<GameObject>(
                 "Assets/StarterAssets/Environment/Prefabs/Wall_Prefab.prefab");
 
-            Vector3[] boxSpots = { new(6f, 0f, 4f), new(-8f, 0f, -2f), new(3f, 0f, -10f), new(-4f, 0f, 8f) };
+            Vector3[] boxSpots = { new(6f, 0f, 4f), new(-8f, 0f, -2f), new(3f, 0f, -10f), new(-4f, 0f, 4f) };
             foreach (Vector3 spot in boxSpots)
             {
                 SpawnDressing(boxPrefab, spot, SurfaceType.Metal);
