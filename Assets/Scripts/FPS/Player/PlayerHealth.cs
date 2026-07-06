@@ -13,6 +13,7 @@ namespace FPS
         public int MaxHealth => _maxHealth;
         public int CurrentHealth { get; private set; }
         public bool IsDead => CurrentHealth <= 0;
+        public Faction Faction => Faction.Player;
 
         private void Awake()
         {

@@ -12,7 +12,7 @@ namespace FPS
         private void OnTriggerStay(Collider other)
         {
             var damageable = other.GetComponentInParent<IDamageable>();
-            if (damageable == null) return;
+            if (damageable == null || damageable.Faction != Faction.Player) return;
 
             _timer += Time.deltaTime;
             if (_timer < _tickInterval) return;

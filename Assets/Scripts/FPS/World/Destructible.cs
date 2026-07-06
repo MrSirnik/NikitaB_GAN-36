@@ -7,6 +7,8 @@ namespace FPS
         [SerializeField] private int _health = 30;
         [SerializeField] private string _destroyEffectPath = FpsAssetPaths.SmallExplosion;
 
+        public Faction Faction => Faction.Neutral;
+
         public void TakeDamage(int amount)
         {
             if (amount <= 0) return;

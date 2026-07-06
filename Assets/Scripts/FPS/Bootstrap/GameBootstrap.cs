@@ -313,7 +313,7 @@ namespace FPS
                 muzzle.transform.localPosition = new Vector3(0f, 0f, 0.6f);
 
                 WeaponController weapon = weaponObject.AddComponent<WeaponController>();
-                weapon.Configure(data, muzzle.transform, aimCamera);
+                weapon.Configure(data, muzzle.transform, aimCamera, Faction.Player);
                 result[i] = weapon;
             }
 
@@ -361,7 +361,7 @@ namespace FPS
 
             WeaponData data = ProjectAsset.Load<WeaponData>("Assets/GameData/Weapons/SMG.asset");
             WeaponController weapon = root.AddComponent<WeaponController>();
-            weapon.Configure(data, muzzle.transform, null);
+            weapon.Configure(data, muzzle.transform, null, Faction.Enemy);
 
             root.AddComponent<RangedAttack>();
             root.AddComponent<EnemyBase>();
@@ -412,7 +412,7 @@ namespace FPS
 
             WeaponData data = ProjectAsset.Load<WeaponData>("Assets/GameData/Weapons/Pistol.asset");
             WeaponController weapon = turretObject.AddComponent<WeaponController>();
-            weapon.Configure(data, muzzle.transform, null);
+            weapon.Configure(data, muzzle.transform, null, Faction.Player);
 
             turretObject.AddComponent<AutoTurret>();
         }
