@@ -66,7 +66,7 @@ namespace FPS.EditorTools
             int next = index + 1;
             if (next >= Scenes.Length)
             {
-                Finish();
+                EditorApplication.delayCall += Finish;
             }
             else
             {

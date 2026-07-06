@@ -31,6 +31,7 @@ namespace FPS
 
         public int CurrentHealth { get; private set; }
         public bool IsDead => CurrentHealth <= 0;
+        public Faction Faction => Faction.Enemy;
 
         private void Awake()
         {

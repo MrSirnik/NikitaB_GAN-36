@@ -10,17 +10,19 @@ namespace FPS
         [SerializeField] private Transform _muzzle;
         [SerializeField] private Camera _aimCamera;
         [SerializeField] private LayerMask _hitMask = ~0;
+        [SerializeField] private Faction _shooterFaction = Faction.Player;
 
         private float _cooldownTimer;
         private Tanks.ProjectilePool _projectilePool;
 
         public WeaponData Data => _data;
 
-        public void Configure(WeaponData data, Transform muzzle, Camera aimCamera)
+        public void Configure(WeaponData data, Transform muzzle, Camera aimCamera, Faction shooterFaction = Faction.Player)
         {
             _data = data;
             _muzzle = muzzle;
             _aimCamera = aimCamera;
+            _shooterFaction = shooterFaction;
         }
 
         private void Awake()
@@ -75,9 +77,14 @@ namespace FPS
         private void ApplyHit(Collider hitCollider, Vector3 point, Vector3 normal)
         {
             var damageable = hitCollider.GetComponentInParent<IDamageable>();
-            damageable?.TakeDamage(_data.damage);
+            bool hitsValidTarget = damageable != null && damageable.Faction != _shooterFaction;
 
-            SurfaceType surface = damageable != null ? SurfaceType.Flesh : ResolveSurface(hitCollider);
+            if (hitsValidTarget)
+            {
+                damageable.TakeDamage(_data.damage);
+            }
+
+            SurfaceType surface = hitsValidTarget ? SurfaceType.Flesh : ResolveSurface(hitCollider);
             EffectSpawner.Spawn(EffectSpawner.ImpactEffectFor(surface), point, Quaternion.LookRotation(normal));
         }
 
@@ -141,7 +148,7 @@ namespace FPS
             foreach (Collider hitCollider in Physics.OverlapSphere(point, 3f))
             {
                 var damageable = hitCollider.GetComponentInParent<IDamageable>();
-                if (damageable != null && damagedAlready.Add(damageable))
+                if (damageable != null && damageable.Faction != _shooterFaction && damagedAlready.Add(damageable))
                 {
                     damageable.TakeDamage(_data.damage);
                 }
